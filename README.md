@@ -1,186 +1,181 @@
-# TruckIT — Moving Services Platform
+# TruckIT - Moving Services Platform
 
-> **This is my original product idea.**
->
-> TruckIT is a moving services platform I conceptualised and designed — connecting customers with truck drivers and movers for residential and commercial moves across Canada. This engineering repository is a **backend prototype and data simulation layer** built to validate the core matching logic, data architecture, and streaming pipeline before the full product is built.
->
-> The full product — including mobile apps for customers, drivers, and movers, plus an admin web dashboard — has been fully designed in Figma and specified in a product requirements document.
+**This is my original product idea.**
+
+TruckIT is a moving services platform I came up with and designed from scratch. The idea is simple: make booking a move as easy as booking a ride. Customers pick up their truck type, set a pickup and dropoff location, and the platform finds the nearest available driver. No back-and-forth calls, no guessing on price.
+
+This repo is the **backend prototype and data simulation layer**. I built it to validate the matching logic, test the data architecture, and start generating realistic data before the full product goes into development. The complete product has been designed in Figma and broken down into user stories across four modules: Customer, Driver, Mover, and Admin.
+
+👉 **[View the Figma Prototype](https://www.figma.com/proto/75QBEKsdixUlP1dGb7OOF2/TruckIT?node-id=232-43&t=2saNmEXCNyX159Zg-1&hide-ui=1)**
 
 ---
 
-## Product Vision
+## The Idea
 
-TruckIT makes booking a move as simple as booking a ride. Customers specify what they need to move, when, and where — the platform finds the nearest available truck and driver, provides real-time tracking, and handles payment. Drivers get a steady stream of jobs with transparent earnings. Movers can opt in for additional loading and packing work.
+Moving is stressful. Finding a truck, negotiating prices, hoping the driver shows up on time - it is a mess. TruckIT fixes that by connecting customers directly with verified truck drivers in their city. Drivers get a steady stream of jobs. Customers get a transparent, trackable experience from booking to delivery.
 
-### Figma Prototype
-
-The full UI/UX has been designed across four modules — Customer, Driver, Mover, and Admin.
-
-👉 **[View the TruckIT Figma Prototype](https://www.figma.com/proto/75QBEKsdixUlP1dGb7OOF2/TruckIT?node-id=232-43&t=2saNmEXCNyX159Zg-1&hide-ui=1)**
+The platform covers three types of users: customers who need to move, drivers who own trucks, and movers who help with packing and loading. There is also an admin dashboard for managing the whole operation.
 
 ---
 
 ## Product Modules
 
-Based on the product requirements document, TruckIT covers four user-facing modules:
-
-| Module | Platform | Stories | Key Capabilities |
+| Module | Platform | Stories | What it covers |
 |---|---|---|---|
-| **Customer** | Mobile App | 11 stories | Book moves · Track driver · Payment · Move history |
-| **Driver** | Mobile App | 11 stories | Accept jobs · Navigation · Earnings · Availability |
-| **Mover** | Mobile App | 10 stories | Browse jobs · Accept packing/loading work · Earnings |
-| **Admin** | Web Dashboard | 6 stories | Manage users · Assign jobs · Reports · Platform settings |
+| Customer | Mobile App | 11 | Book moves, track driver, payment, move history |
+| Driver | Mobile App | 11 | Accept jobs, navigation, earnings, availability toggle |
+| Mover | Mobile App | 10 | Browse jobs, accept packing and loading work, earnings |
+| Admin | Web Dashboard | 6 | Manage users, assign jobs, reports, platform settings |
 
-### Selected User Stories
+A few examples from the user stories document:
 
-**Customer (CUS-05) — Create Move Request**
-> As a customer, I want to create a move request by specifying pickup/delivery addresses, date, time, and services so that I can book movers.
+**CUS-05 - Create Move Request**
+> As a customer, I want to create a move request by specifying pickup and delivery addresses, date, time, and services so that I can book movers.
 
-**Driver (DRV-05) — Accept Move Request**
+**DRV-05 - Accept Move Request**
 > As a driver, I want to accept a move request so that I can confirm my availability and begin the job.
 
-**Driver (DRV-07) — Navigate to Location**
-> As a driver, I want integrated navigation to pickup and delivery locations so that I can reach destinations efficiently.
-
-**Admin (ADM-01) — View Platform Dashboard**
+**ADM-01 - View Platform Dashboard**
 > As an admin, I want to see an overview of active users, pending move requests, and revenue so that I can monitor platform health.
 
 ---
 
-## What This Repository Is
+## What This Repo Actually Is
 
-This repository is the **backend engineering prototype** — built to:
+This is not the full product. It is a backend prototype built to answer a few questions before committing to the full build:
 
-1. **Validate the core matching algorithm** — can we find the nearest available truck of the right type within seconds?
-2. **Prove the data architecture** — does the Redis + Postgres + Kafka combination handle real-time dispatch efficiently at scale?
-3. **Simulate realistic data** — generate 182,500 move assignments per year to train future ML pricing and ETA models
-4. **Build the data engineering foundation** — create the pipeline infrastructure (BigQuery + dbt + Airflow) before the app is live
+1. Can the matching engine find the nearest available truck of the right type in under a second?
+2. Does the Redis + Postgres + Kafka combination hold up at scale?
+3. Can we generate enough realistic data to train a pricing model before the app goes live?
+4. What does the data pipeline look like when it grows to 180,000+ records?
 
-### What this prototype does NOT include yet
+The simulator runs five times a day and generates 500 move requests across ten Canadian cities. By the time the mobile apps are ready, there will already be over 180,000 historical assignments to work with.
 
-| Feature | Status | Notes |
-|---|---|---|
-| Authentication / Authorization | 🔜 Planned | JWT + OAuth2, driver identity verification |
-| Customer mobile app | 🔜 Planned | React Native, matches Figma designs |
-| Driver mobile app | 🔜 Planned | React Native, real-time job notifications |
-| Mover mobile app | 🔜 Planned | React Native |
-| Admin web dashboard | 🔜 Planned | Next.js, analytics and platform management |
-| Real-time driver tracking | 🔜 Planned | WebSocket, location updates every 30s |
-| Payment processing | 🔜 Planned | Stripe integration |
-| Push notifications | 🔜 Planned | Firebase Cloud Messaging |
-| Move scheduling | 🔜 Planned | Date/time booking, not just on-demand |
-| In-app chat | 🔜 Planned | Customer ↔ driver messaging |
-| Driver ratings | 🔜 Planned | Post-move review system |
+### What is not built yet
+
+| Feature | Notes |
+|---|---|
+| Authentication and authorisation | JWT + OAuth2, driver identity verification |
+| Customer mobile app | React Native, based on Figma designs |
+| Driver mobile app | React Native, real-time job notifications |
+| Mover mobile app | React Native |
+| Admin web dashboard | Next.js |
+| Real-time driver tracking | WebSocket, location updates every 30 seconds |
+| Payment processing | Stripe |
+| Push notifications | Firebase Cloud Messaging |
+| Move scheduling | Date and time booking, not just on-demand |
+| In-app chat | Customer to driver messaging |
+| Driver ratings | Post-move review system |
 
 ---
 
 ## Full Platform Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    MOBILE / WEB APP                   🔜    │
-│              Customer + Driver + Mover Apps                  │
-│         Book moves · Track driver · Manage earnings         │
-│         Admin Dashboard · Reports · User management         │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-┌──────────────────────────▼──────────────────────────────────┐
-│                    FASTAPI LAYER                      ✅    │
-│   /move/request    /move/complete    /predict/price          │
-│   /driver/register  /truck/register  /auth/login            │
-│              Request validation · Kafka publishing           │
-└──────────┬────────────────────────────┬─────────────────────┘
-           │                            │
-┌──────────▼──────────┐      ┌──────────▼──────────────┐
-│      KAFKA          │  ✅  │     ML MODEL        🔜  │
-│  producer           │      │  Move pricing            │
-│  consumer           │      │  ETA prediction          │
-│  truck.move.        │      │  Trained on 182,500      │
-│  requested          │      │  historical assignments  │
-└──────────┬──────────┘      └──────────────────────────┘
-           │
-┌──────────▼──────────────────────────────────────────────────┐
-│                  OPERATIONAL LAYER                    ✅    │
-│                                                             │
-│   Redis (Geo + Status)          Postgres (Source of Truth)  │
-│   ├── GEOSEARCH proximity       ├── customers               │
-│   ├── truck availability        ├── drivers                 │
-│   └── 3-field hash per truck    ├── trucks                  │
-│       status|driver_id|type     └── move_assignments        │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-┌──────────────────────────▼──────────────────────────────────┐
-│               DATA ENGINEERING LAYER                  🔜    │
-│                                                             │
-│   Airflow  →  dbt  →  BigQuery  →  Metabase                 │
-│                                                             │
-│   dbt models:                                               │
-│   ├── staging/   stg_assignments · stg_customers            │
-│   ├── marts/     fact_assignments · dim_trucks              │
-│   └── analytics/ demand_by_zone · driver_performance        │
-│                                                             │
-│   Dashboard metrics:                                        │
-│   ├── Demand heatmap by city + zone                         │
-│   ├── Peak hours analysis                                   │
-│   └── Driver performance KPIs                               │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-┌──────────────────────────▼──────────────────────────────────┐
-│                   AGENTIC LAYER                       🔜    │
-│                                                             │
-│   Dispatch Agent                                            │
-│   ├── Handles edge cases the rule engine can't              │
-│   └── Tools: search_trucks · assign_truck · notify          │
-│                                                             │
-│   Customer Support Agent                                    │
-│   ├── "Where is my driver?" → queries live Postgres         │
-│   ├── "Change my dropoff"   → updates assignment            │
-│   └── "I need bigger truck" → reruns matching               │
-│                                                             │
-│   Route Optimisation Agent                                  │
-│   └── Batches nearby pickups for single driver              │
-│                                                             │
-│   Powered by: Claude API · LangGraph · Anthropic Tool Use   │
-└─────────────────────────────────────────────────────────────┘
++-------------------------------------------------------------+
+|                   MOBILE / WEB APP                   (soon) |
+|             Customer + Driver + Mover Apps                  |
+|        Book moves, track driver, manage earnings            |
+|        Admin Dashboard, reports, user management            |
++---------------------------+---------------------------------+
+                            |
++---------------------------v---------------------------------+
+|                   FASTAPI LAYER                     (done)  |
+|  /move/request   /move/complete   /predict/price            |
+|  /driver/register   /truck/register   /auth/login           |
+|             Request validation, Kafka publishing            |
++----------+---------------------------------+----------------+
+           |                                |
++----------v----------+        +-----------v--------------+
+|       KAFKA  (done) |        |    ML MODEL        (soon)|
+|  producer           |        |  Move pricing            |
+|  consumer           |        |  ETA prediction          |
+|  truck.move.        |        |  Trained on 182,500      |
+|  requested          |        |  historical assignments  |
++----------+----------+        +--------------------------+
+           |
++----------v--------------------------------------------------+
+|                 OPERATIONAL LAYER                   (done)  |
+|                                                             |
+|  Redis (Geo + Status)         Postgres (Source of Truth)    |
+|  - GEOSEARCH proximity        - customers                   |
+|  - truck availability         - drivers                     |
+|  - 3-field hash per truck     - trucks                      |
+|    status, driver_id, type    - move_assignments            |
++---------------------------+---------------------------------+
+                            |
++---------------------------v---------------------------------+
+|              DATA ENGINEERING LAYER                 (soon)  |
+|                                                             |
+|  Airflow  ->  dbt  ->  BigQuery  ->  Metabase               |
+|                                                             |
+|  dbt models:                                                |
+|  - staging:   stg_assignments, stg_customers                |
+|  - marts:     fact_assignments, dim_trucks                  |
+|  - analytics: demand_by_zone, driver_performance            |
+|                                                             |
+|  Dashboard:                                                 |
+|  - Demand heatmap by city and zone                          |
+|  - Peak hours breakdown                                     |
+|  - Driver performance KPIs                                  |
++---------------------------+---------------------------------+
+                            |
++---------------------------v---------------------------------+
+|                  AGENTIC LAYER                      (soon)  |
+|                                                             |
+|  Dispatch Agent                                             |
+|  - Handles edge cases the rule engine cannot               |
+|  - Tools: search_trucks, assign_truck, notify               |
+|                                                             |
+|  Customer Support Agent                                     |
+|  - "Where is my driver?" queries live Postgres              |
+|  - "Change my dropoff" updates the assignment               |
+|  - "I need a bigger truck" reruns the matching engine       |
+|                                                             |
+|  Route Optimisation Agent                                   |
+|  - Groups nearby pickups for a single driver                |
+|                                                             |
+|  Built with: Claude API, LangGraph, Anthropic Tool Use      |
++-------------------------------------------------------------+
 ```
 
 ---
 
 ## Build Stages
 
-| Stage | Focus | Status |
+| Stage | What it covers | Status |
 |---|---|---|
-| **Stage 1** | Software Engineering — API, Kafka, Redis, Postgres, Simulator | ✅ Complete |
-| **Stage 2** | Data Engineering — BigQuery, dbt, Airflow, Dashboard | 🔜 In progress |
-| **Stage 3** | Deployment — Railway, Upstash, CI/CD | 🔜 Planned |
-| **Stage 4** | ML Engineering — Pricing model, ETA prediction | 🔜 Planned |
-| **Stage 5** | Agentic AI — Dispatch agent, Support agent, LangGraph | 🔜 Planned |
-| **Stage 6** | Full Product — Mobile apps, Auth, Payments, Notifications | 🔜 Planned |
+| Stage 1 | Software Engineering - API, Kafka, Redis, Postgres, Simulator | Done |
+| Stage 2 | Data Engineering - BigQuery, dbt, Airflow, Dashboard | In progress |
+| Stage 3 | Deployment - Railway, Upstash, CI/CD | Planned |
+| Stage 4 | ML Engineering - Pricing model, ETA prediction | Planned |
+| Stage 5 | Agentic AI - Dispatch agent, Support agent, LangGraph | Planned |
+| Stage 6 | Full Product - Mobile apps, auth, payments, notifications | Planned |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Purpose |
+| Layer | Tool | Why |
 |---|---|---|
-| API | FastAPI | REST endpoints, request validation |
-| Messaging | Apache Kafka | Event streaming for move requests |
-| Cache / Geo | Redis | Real-time truck availability + geo proximity search |
-| Database | PostgreSQL 15 | Source of truth for all entities |
-| Serialisation | Pydantic v2 | Request/response models with validation |
-| Containerisation | Docker Compose | Local dev environment |
-| Simulation | Python + Faker | Realistic daily data generation |
-| DB Admin | pgAdmin | Postgres GUI |
-| **Planned** | Airflow | Pipeline orchestration |
-| **Planned** | dbt | Data transformation + modelling |
-| **Planned** | BigQuery | Analytics warehouse |
-| **Planned** | Metabase | Business intelligence dashboard |
-| **Planned** | scikit-learn | Pricing + ETA ML models |
-| **Planned** | Claude API + LangGraph | Agentic dispatch + support |
-| **Planned** | React Native | Customer + Driver mobile apps |
-| **Planned** | Next.js | Admin web dashboard |
-| **Planned** | Stripe | Payment processing |
-| **Planned** | Firebase | Push notifications |
+| API | FastAPI | Fast to build, great for async, auto docs via Swagger |
+| Messaging | Apache Kafka | Decouples the API from the matching engine |
+| Cache and Geo | Redis | GEOSEARCH makes proximity matching fast and simple |
+| Database | PostgreSQL 15 | Solid relational store for everything that matters long term |
+| Validation | Pydantic v2 | Clean request models with type safety |
+| Containers | Docker Compose | Runs the whole local stack in one command |
+| Data gen | Python + Faker | Realistic Canadian names, phones, emails |
+| DB GUI | pgAdmin | Inspect data without writing SQL every time |
+| Planned | Airflow | Schedule and monitor the data pipeline |
+| Planned | dbt | Transform raw events into analytics-ready models |
+| Planned | BigQuery | Separate OLAP store for analytics queries |
+| Planned | Metabase | Business dashboards without writing SQL |
+| Planned | scikit-learn | Pricing and ETA prediction |
+| Planned | Claude API + LangGraph | Agentic dispatch and customer support |
+| Planned | React Native | Customer and driver mobile apps |
+| Planned | Next.js | Admin web dashboard |
+| Planned | Stripe | Payment processing |
+| Planned | Firebase | Push notifications |
 
 ---
 
@@ -189,19 +184,19 @@ This repository is the **backend engineering prototype** — built to:
 ```
 TruckIT-engineering/
 ├── app/
-│   ├── main.py                  # FastAPI app entry point
+│   ├── main.py                  # FastAPI app, routes registered here
 │   ├── api/
 │   │   ├── moves.py             # POST /truck/move/request
-│   │   └── auth.py              # Authentication (coming soon)
+│   │   └── auth.py              # Auth endpoints (coming soon)
 │   ├── core/
-│   │   └── kafka.py             # Kafka configuration
+│   │   └── kafka.py             # Kafka config
 │   ├── models/
-│   │   └── move.py              # MoveRequest Pydantic model
+│   │   └── move.py              # MoveRequest model with validation
 │   ├── services/
-│   │   ├── producer.py          # Kafka producer
-│   │   ├── consumer.py          # Truck matching engine
-│   │   └── simulator.py         # Daily request simulator
-│   └── seed_canada.py           # One-time seed script
+│   │   ├── producer.py          # Publishes move requests to Kafka
+│   │   ├── consumer.py          # Reads from Kafka, matches trucks
+│   │   └── simulator.py         # Runs daily to generate test data
+│   └── seed_canada.py           # One-time setup: trucks and drivers
 ├── docker/
 │   └── docker-compose.yml       # Kafka, Zookeeper, Redis, Postgres
 ├── requirements.txt
@@ -212,9 +207,8 @@ TruckIT-engineering/
 
 ## Data Model
 
-### Postgres Tables
-
-**customers** — created daily by the simulator
+### customers
+Created daily by the simulator. In production these come from app signups.
 ```
 customer_id   VARCHAR(50) PK
 name          VARCHAR(100)
@@ -224,7 +218,8 @@ city          VARCHAR(50)
 created_at    TIMESTAMP
 ```
 
-**drivers** — seeded once via seed_canada.py
+### drivers
+Seeded once. In production these come from driver registrations.
 ```
 driver_id     VARCHAR(50) PK
 name          VARCHAR(100)
@@ -235,10 +230,11 @@ license_no    VARCHAR(20)
 created_at    TIMESTAMP
 ```
 
-**trucks** — seeded once via seed_canada.py
+### trucks
+Seeded once and linked to a driver.
 ```
 truck_id      VARCHAR(50) PK
-driver_id     VARCHAR(50) FK → drivers
+driver_id     VARCHAR(50) FK to drivers
 type          VARCHAR(50)
 description   VARCHAR(200)
 plate         VARCHAR(20)
@@ -248,52 +244,55 @@ capacity_kg   INTEGER
 created_at    TIMESTAMP
 ```
 
-**move_assignments** — written by consumer on every matched request
+### move_assignments
+Written by the consumer every time a truck is matched to a request.
 ```
 id                    SERIAL PK
 customer_id           VARCHAR(50)
-pickup_lat/lng        FLOAT
-dropoff_lat/lng       FLOAT
+pickup_lat            FLOAT
+pickup_lng            FLOAT
+dropoff_lat           FLOAT
+dropoff_lng           FLOAT
 assigned_truck        VARCHAR(50)
 driver_id             VARCHAR(50)
 driver                VARCHAR(100)
 truck_type            VARCHAR(50)
-service_type          VARCHAR(50)   packing | loading | full_move
-driver_to_pickup_km   FLOAT
-pickup_to_dropoff_km  FLOAT
-status                VARCHAR(20)   PENDING | ASSIGNED | COMPLETED
+service_type          VARCHAR(50)     packing, loading, or full_move
+driver_to_pickup_km   FLOAT           haversine: driver location to pickup
+pickup_to_dropoff_km  FLOAT           haversine: pickup to dropoff
+status                VARCHAR(20)     PENDING, ASSIGNED, or COMPLETED
 created_at            TIMESTAMP
 ```
 
-### Redis Schema
+### Redis
 
 ```
-trucks              Geo sorted set — 10,000 truck locations for proximity search
+trucks               Geo sorted set with 10,000 truck positions
+                     Used by GEOSEARCH for proximity matching
 
-truck:{city}-{id}   Hash — 3 fields only (intentionally lightweight)
-                    status    → available | busy
-                    driver_id → FK to Postgres
-                    type      → for geosearch type filtering
+truck:{city}-{id}    Hash with exactly 3 fields
+                     status    - available or busy
+                     driver_id - links back to Postgres
+                     type      - used to filter by truck type in geosearch
 ```
+
+Redis only stores what the matching engine needs at runtime. Everything else stays in Postgres and gets pulled via a JOIN after a match is found. This keeps Redis lean at scale.
 
 ### Truck Types
 
-| Type | Use Case | Capacity |
+| Type | Best for | Capacity |
 |---|---|---|
-| `cargo_van` | Studio / 1-bed apartment | 500kg |
-| `small_truck` | 1-2 bed apartment | 1,500kg |
-| `medium_truck` | 2-3 bed house | 3,500kg |
-| `large_truck` | 4+ bed house / office | 7,000kg |
-| `specialty_truck` | Piano, fragile, climate-controlled | 2,000kg |
+| cargo_van | Studio or 1-bedroom apartment | 500kg |
+| small_truck | 1 to 2 bedroom apartment | 1,500kg |
+| medium_truck | 2 to 3 bedroom house | 3,500kg |
+| large_truck | 4+ bedroom house or office | 7,000kg |
+| specialty_truck | Piano, fragile items, climate-controlled | 2,000kg |
 
 ---
 
 ## Getting Started
 
-### Prerequisites
-
-- Docker + Docker Compose
-- Python 3.10+
+You need Docker, Docker Compose, and Python 3.10 or above.
 
 ### 1. Clone the repo
 
@@ -302,13 +301,15 @@ git clone https://github.com/yourusername/TruckIT-engineering.git
 cd TruckIT-engineering
 ```
 
-### 2. Start infrastructure
+### 2. Start the infrastructure
 
 ```bash
 cd docker && docker-compose up -d
 ```
 
-### 3. Install dependencies
+This brings up Kafka and Zookeeper on port 9092, Redis on 6379, and Postgres on 5433.
+
+### 3. Install Python dependencies
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
@@ -321,6 +322,8 @@ pip install -r requirements.txt
 python app/seed_canada.py
 ```
 
+You should see 10,000 trucks and 10,000 drivers seeded across 10 cities, with Redis and Postgres in sync.
+
 ### 5. Create the Kafka topic
 
 ```bash
@@ -330,19 +333,19 @@ docker exec -it kafka kafka-topics \
   --partitions 1 --replication-factor 1
 ```
 
-### 6. Start the consumer (Terminal 1)
+### 6. Start the consumer in Terminal 1
 
 ```bash
 python app/services/consumer.py
 ```
 
-### 7. Start the API (Terminal 2)
+### 7. Start the API in Terminal 2
 
 ```bash
 uvicorn app.main:app --reload --port 9010
 ```
 
-### 8. Open Swagger
+### 8. Open Swagger UI
 
 ```
 http://localhost:9010/docs
@@ -350,9 +353,9 @@ http://localhost:9010/docs
 
 ---
 
-## API Endpoints
+## Sending a Move Request
 
-### POST `/truck/move/request`
+Use the Swagger UI or send a POST to `/truck/move/request`:
 
 ```json
 {
@@ -366,40 +369,56 @@ http://localhost:9010/docs
 }
 ```
 
-Valid `truck_type`: `cargo_van` · `small_truck` · `medium_truck` · `large_truck` · `specialty_truck`
+Truck types: `cargo_van`, `small_truck`, `medium_truck`, `large_truck`, `specialty_truck`
 
-Valid `service_type`: `packing` · `loading` · `full_move`
+Service types: `packing`, `loading`, `full_move`
+
+The consumer will log something like:
+
+```
+Request | Customer: cust:20260418-1 | Type: medium_truck | Service: full_move
+Assigned: truck:calgary-948
+Driver: Bradley Scott (driver:calgary-948)
+Truck: medium_truck - 2 to 3 bedroom house moves
+Capacity: 3500kg
+Distance: Driver to Pickup 2.81km | Pickup to Dropoff 14.91km
+Saved to Postgres - status: ASSIGNED
+```
 
 ---
 
 ## Simulator
 
-Generates 500 realistic daily requests across 10 Canadian cities.
+The simulator creates fresh customers and fires move requests against the API. It runs five times a day in production via cron.
 
 ```bash
 python app/services/simulator.py
 ```
 
-**Production cron schedule (5× daily):**
+Each run resets all 10,000 trucks to available, creates 100 new customers in Postgres, and sends 100 requests spread across all ten cities.
+
+**Production schedule:**
 ```
-0  8 * * *   →  8am  morning rush
-0 11 * * *   → 11am  late morning
-0 14 * * *   →  2pm  afternoon
-0 17 * * *   →  5pm  evening rush
-0 20 * * *   →  8pm  night
+0  8 * * *   8am   morning rush
+0 11 * * *   11am  late morning
+0 14 * * *   2pm   afternoon
+0 17 * * *   5pm   evening rush
+0 20 * * *   8pm   night
 ```
 
-**Annual output:** 182,500 assignments · 182,500 customers
+500 requests and 500 new customers every day. By end of year that is 182,500 assignments in Postgres ready for analytics and model training.
 
 ---
 
 ## Seeded Data
 
-| Entity | Count | Distribution |
+| What | Count | Details |
 |---|---|---|
-| Cities | 10 | Calgary · Edmonton · Vancouver · Toronto · Montreal · Ottawa · Winnipeg · Halifax · Saskatoon · Regina |
-| Trucks | 10,000 | 1,000/city · 5 types · 8 zones |
-| Drivers | 10,000 | One per truck · same city |
+| Cities | 10 | Calgary, Edmonton, Vancouver, Toronto, Montreal, Ottawa, Winnipeg, Halifax, Saskatoon, Regina |
+| Trucks | 10,000 | 1,000 per city, 5 types, spread across 8 zones |
+| Drivers | 10,000 | One per truck, same city |
+
+Zones: downtown, airport, suburbs, industrial, university, hospital, shopping mall, random
 
 ---
 
@@ -422,24 +441,40 @@ REQUEST_DELAY_SECONDS=1.5
 
 ---
 
-## Why This Project
+## pgAdmin
 
-TruckIT is both a **product I designed** and a **technical portfolio** covering four engineering disciplines:
+```
+Host:     localhost
+Port:     5433
+Database: truckit
+Username: truckit
+Password: truckit123
+```
 
-| Discipline | What it demonstrates |
+---
+
+## Why I Built It This Way
+
+Most portfolio projects are either a clean backend with no real data, or a data pipeline with no real application behind it. I wanted to build something that covers the full stack from product idea to agentic AI.
+
+The engineering layers build on each other intentionally. The simulator generates data that trains the ML models. The ML models feed into the agentic layer. The agentic layer eventually powers the mobile apps. Nothing here is throwaway work.
+
+| Discipline | What this project shows |
 |---|---|
-| **Product Design** | Original concept · Figma prototype · 38 user stories across 4 modules |
-| **Software Engineering** | Production API · event streaming · real-time geo matching · containerisation |
-| **Data Engineering** | Pipeline design · dbt modelling · warehouse architecture · orchestration |
-| **ML Engineering** | Feature engineering on real event data · model training · prediction serving |
-| **Agentic AI** | Tool use · multi-agent orchestration · LLM decisions on live operational data |
+| Product Design | Original concept, Figma prototype, 38 user stories across 4 modules |
+| Software Engineering | Production API, event streaming, real-time geo matching, containerisation |
+| Data Engineering | Pipeline design, dbt modelling, warehouse architecture, orchestration |
+| ML Engineering | Feature engineering on real event data, model training, serving predictions |
+| Agentic AI | Tool use, multi-agent orchestration, LLM decisions on live operational data |
 
 ---
 
 ## Author
 
 **Ayo Ogunbanwo**
-Original product concept, design, and engineering.
 
-- Figma Prototype: [View Design](https://www.figma.com/proto/75QBEKsdixUlP1dGb7OOF2/TruckIT?node-id=232-43&t=2saNmEXCNyX159Zg-1&hide-ui=1)
-- Product Requirements: Available on request
+Product concept, design, and engineering.
+
+Figma Prototype: [View Design](https://www.figma.com/proto/75QBEKsdixUlP1dGb7OOF2/TruckIT?node-id=232-43&t=2saNmEXCNyX159Zg-1&hide-ui=1)
+
+Product requirements document available on request.
