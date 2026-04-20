@@ -1,21 +1,5 @@
-from kafka import KafkaProducer
 from kafka.errors import KafkaError
-import json
-import os
-
-TOPIC = os.getenv("KAFKA_TOPIC", "truck.move.requested")
-
-_producer = None
-
-
-def get_producer() -> KafkaProducer:
-    global _producer
-    if _producer is None:
-        _producer = KafkaProducer(
-            bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"),
-            value_serializer=lambda v: json.dumps(v).encode("utf-8")
-        )
-    return _producer
+from app.core.kafka import get_producer, TOPIC
 
 
 def send_move_request(data: dict):

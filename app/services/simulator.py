@@ -29,16 +29,17 @@ import psycopg2
 import redis
 import random
 import time
-import os
 from datetime import datetime
 from faker import Faker
+
+from app.core.settings import get_env, get_float_env, get_int_env
 
 fake = Faker("en_CA")
 
 # ── config ────────────────────────────────────────────────────────────────────
-API_BASE_URL           = os.getenv("API_BASE_URL", "http://localhost:9010")
-TOTAL_REQUESTS         = int(os.getenv("DAILY_REQUESTS", "100"))   # per run
-DELAY_BETWEEN_REQUESTS = float(os.getenv("REQUEST_DELAY_SECONDS", "1.5"))
+API_BASE_URL = get_env("API_BASE_URL")
+TOTAL_REQUESTS = get_int_env("DAILY_REQUESTS")   # per run
+DELAY_BETWEEN_REQUESTS = get_float_env("REQUEST_DELAY_SECONDS")
 
 # ── city config ───────────────────────────────────────────────────────────────
 CITIES = {
@@ -63,18 +64,18 @@ SERVICE_TYPE_WEIGHTS = [15, 20, 65]
 # ── connections ───────────────────────────────────────────────────────────────
 def get_db():
     return psycopg2.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        port=int(os.getenv("DB_PORT", 5433)),
-        dbname=os.getenv("DB_NAME", "truckit"),
-        user=os.getenv("DB_USER", "truckit"),
-        password=os.getenv("DB_PASSWORD", "truckit123")
+        host=get_env("DB_HOST"),
+        port=get_int_env("DB_PORT"),
+        dbname=get_env("DB_NAME"),
+        user=get_env("DB_USER"),
+        password=get_env("DB_PASSWORD")
     )
 
 
 def get_redis():
     return redis.Redis(
-        host=os.getenv("REDIS_HOST", "localhost"),
-        port=int(os.getenv("REDIS_PORT", 6379)),
+        host=get_env("REDIS_HOST"),
+        port=get_int_env("REDIS_PORT"),
         decode_responses=False
     )
 

@@ -27,15 +27,24 @@ import redis
 import random
 from faker import Faker
 
+from app.core.settings import get_env, get_int_env
+
 fake = Faker("en_CA")
 
 # ── connections ───────────────────────────────────────────────────────────────
 conn = psycopg2.connect(
-    host="localhost", port=5433,
-    dbname="truckit", user="truckit", password="truckit123"
+    host=get_env("DB_HOST"),
+    port=get_int_env("DB_PORT"),
+    dbname=get_env("DB_NAME"),
+    user=get_env("DB_USER"),
+    password=get_env("DB_PASSWORD")
 )
 cursor = conn.cursor()
-r = redis.Redis(host="localhost", port=6379, decode_responses=False)
+r = redis.Redis(
+    host=get_env("REDIS_HOST"),
+    port=get_int_env("REDIS_PORT"),
+    decode_responses=False
+)
 
 # ── constants ─────────────────────────────────────────────────────────────────
 GEO_KEY            = "trucks"

@@ -1,20 +1,9 @@
-"""
-TruckIT Consumer — Truck Matching Engine
-
-Redis is kept lightweight:
-    - geosearch  → finds nearby trucks by location + type
-    - hget/hset  → checks status, marks busy (3 fields only)
-
-All driver/truck details are fetched from Postgres after match.
-"""
-
+from app.core.kafka import TOPIC, BOOTSTRAP_SERVERS
+from app.core.redis import get_redis
+from app.core.database import get_db
 from kafka import KafkaConsumer
 from math import radians, sin, cos, sqrt, atan2
-import redis
 import json
-import psycopg2
-import os
-
 
 
 def haversine(lat1, lng1, lat2, lng2) -> float:
@@ -27,31 +16,19 @@ def haversine(lat1, lng1, lat2, lng2) -> float:
 
 
 consumer = KafkaConsumer(
-    "truck.move.requested",
-    bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"),
+    TOPIC,                          # from core
+    bootstrap_servers=BOOTSTRAP_SERVERS,  # from core
     auto_offset_reset="latest",
     value_deserializer=lambda x: json.loads(x.decode("utf-8"))
 )
 
-r = redis.Redis(
-    host=os.getenv("REDIS_HOST", "localhost"),
-    port=int(os.getenv("REDIS_PORT", 6379)),
-    decode_responses=False
-)
-
-conn = psycopg2.connect(
-    host=os.getenv("DB_HOST", "localhost"),
-    port=int(os.getenv("DB_PORT", 5433)),
-    dbname=os.getenv("DB_NAME", "truckit"),
-    user=os.getenv("DB_USER", "truckit"),
-    password=os.getenv("DB_PASSWORD", "truckit123")
-)
+r    = get_redis()   # from core
+conn = get_db()      # from core
 
 GEO_KEY = "trucks"
 
-print(" Truck Matching Engine Started...")
+print("Truck Matching Engine Started...")
 
-# ── main loop ─────────────────────────────────────────────────────────────────
 for message in consumer:
     cursor = conn.cursor()
     try:
@@ -66,7 +43,7 @@ for message in consumer:
         service_type   = data.get("service_type")
 
         if not all([pickup_lat, pickup_lng, customer_id, requested_type]):
-            print(f"  Invalid message — missing required fields: {data}")
+            print(f"  Invalid message, missing required fields: {data}")
             continue
 
         print(f"\n  Request | Customer: {customer_id} | Type: {requested_type} | Service: {service_type}")
@@ -80,13 +57,11 @@ for message in consumer:
         driver_to_pickup_km  = None
         pickup_to_dropoff_km = None
 
-        # ── pickup → dropoff distance (haversine) ─────────────────────────────
         if dropoff_lat and dropoff_lng:
             pickup_to_dropoff_km = haversine(
                 pickup_lat, pickup_lng, dropoff_lat, dropoff_lng
             )
 
-        # ── geo search with expanding radius ─────────────────────────────────
         for radius in [5, 10, 25, 50]:
             raw_trucks = r.geosearch(
                 GEO_KEY,
@@ -98,7 +73,6 @@ for message in consumer:
                 sort="ASC"
             )
 
-            # filter: available + correct truck type (Redis only holds 3 fields)
             available = [
                 (name.decode("utf-8"), round(dist, 2))
                 for name, dist in raw_trucks
@@ -109,16 +83,10 @@ for message in consumer:
             if available:
                 assigned, driver_to_pickup_km = available[0]
 
-
                 driver_id = r.hget(assigned, "driver_id").decode("utf-8")
 
-
                 cursor.execute("""
-                    SELECT
-                        d.name,
-                        t.type,
-                        t.description,
-                        t.capacity_kg
+                    SELECT d.name, t.type, t.description, t.capacity_kg
                     FROM trucks t
                     JOIN drivers d ON t.driver_id = d.driver_id
                     WHERE t.truck_id = %s
@@ -128,7 +96,6 @@ for message in consumer:
                 if row:
                     driver_name, truck_type, truck_description, capacity_kg = row
 
-
                 r.hset(assigned, mapping={
                     "status":    "busy",
                     "driver_id": driver_id,
@@ -137,15 +104,14 @@ for message in consumer:
 
                 print(f"     Assigned : {assigned}")
                 print(f"     Driver   : {driver_name} ({driver_id})")
-                print(f"     Truck    : {truck_type} — {truck_description}")
+                print(f"     Truck    : {truck_type} - {truck_description}")
                 print(f"     Capacity : {capacity_kg}kg")
-                print(f"     Distance : Driver → Pickup {driver_to_pickup_km}km | Pickup → Dropoff {pickup_to_dropoff_km}km")
+                print(f"     Distance : Driver to Pickup {driver_to_pickup_km}km | Pickup to Dropoff {pickup_to_dropoff_km}km")
                 break
 
         if not assigned:
             print(f"  No available {requested_type} found within 50km")
 
-        # ── save to Postgres ──────────────────────────────────────────────────
         cursor.execute("""
             INSERT INTO move_assignments (
                 customer_id, pickup_lat, pickup_lng,
@@ -164,7 +130,7 @@ for message in consumer:
         ))
 
         conn.commit()
-        print(f" Saved to Postgres — status: {'ASSIGNED' if assigned else 'PENDING'}")
+        print(f"  Saved to Postgres - status: {'ASSIGNED' if assigned else 'PENDING'}")
 
     except Exception as e:
         conn.rollback()

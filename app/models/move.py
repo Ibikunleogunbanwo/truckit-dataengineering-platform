@@ -1,21 +1,5 @@
 from pydantic import BaseModel, field_validator
-from typing import Literal
-
-# Valid truck types aligned with TruckIT moving platform
-TruckType = Literal[
-    "cargo_van",
-    "small_truck",
-    "medium_truck",
-    "large_truck",
-    "specialty_truck"
-]
-
-# Service types from user stories (CUS-05)
-ServiceType = Literal[
-    "packing",
-    "loading",
-    "full_move"
-]
+from app.models.enums.enums import TruckType, ServiceType
 
 
 class MoveRequest(BaseModel):
